@@ -1,0 +1,32 @@
+import tensorflow as tf
+import keras
+
+def make_models():
+    model_draw = tf.keras.models.Sequential()
+    model_draw.add(tf.keras.layers.Dense(153, activation='linear'))
+    model_draw.add(tf.keras.layers.Dropout(0.1))
+    model_draw.add(tf.keras.layers.Dense(30, activation='relu'))
+    model_draw.add(tf.keras.layers.Dropout(0.1))
+    model_draw.add(tf.keras.layers.Dense(12, activation='relu'))
+    model_draw.add(tf.keras.layers.Dropout(0.1))
+    model_draw.add(tf.keras.layers.Dense(1, activation='linear'))
+    model_draw.compile(optimizer="adam", loss=tf.keras.losses.BinaryCrossentropy(), metrics=["accuracy"])
+    model_discard = tf.keras.models.Sequential()
+    model_discard.add(tf.keras.layers.Dense(153, activation='linear'))
+    model_discard.add(tf.keras.layers.Dropout(0.1))
+    model_discard.add(tf.keras.layers.Dense(30, activation='relu'))
+    model_discard.add(tf.keras.layers.Dropout(0.1))
+    model_discard.add(tf.keras.layers.Dense(12, activation='relu'))
+    model_discard.add(tf.keras.layers.Dropout(0.1))
+    model_discard.add(tf.keras.layers.Dense(1, activation='linear'))
+    model_discard.compile(optimizer="adam", loss=tf.keras.losses.BinaryCrossentropy(), metrics=["accuracy"])
+    model_bet = tf.keras.models.Sequential()
+    model_bet.add(tf.keras.layers.Dense(153, activation='linear'))
+    model_bet.add(tf.keras.layers.Dropout(0.1))
+    model_bet.add(tf.keras.layers.Dense(30, activation='relu'))
+    model_bet.add(tf.keras.layers.Dropout(0.1))
+    model_bet.add(tf.keras.layers.Dense(12, activation='relu'))
+    model_bet.add(tf.keras.layers.Dropout(0.1))
+    model_bet.add(tf.keras.layers.Dense(1, activation='linear'))
+    model_bet.compile(optimizer="adam", loss=tf.keras.losses.BinaryCrossentropy(), metrics=["accuracy"])
+    return model_draw, model_discard, model_bet
