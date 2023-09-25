@@ -1,67 +1,8 @@
-import numpy as np
 from random import randint
+import numpy as np
 from random import shuffle
 import copy
 from make_models import make_models
-
-class library:
-    def __init__(self, pool=1):
-        self.hand = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-        self.on_show = []
-        self.drop = []
-        self.pool = pool
-    def refresh(self):
-        shuffle(self.hand)
-    def place(self):
-        draw = self.hand.pop()
-        self.on_show.append(draw)
-    def replace(self):
-        draw = self.hand.pop()
-        self.drop.append(self.on_show.pop())
-        self.on_show.append(draw)
-    def drawn(self):
-        return self.hand.pop()
-
-class player():
-    def __init__(self, draw_card = -1, pool = 0, big:int = -2, name_=''):
-        self.hand = []
-        self.drop = []
-        self.currency_before = 4
-        self.currency_after = 4
-        self.draw_card = draw_card
-        self.pool = pool
-        self.big = big
-        self.bet_decision = False
-        self.matrix = [0 for i in range(153)]
-        self.name = name_
-    def draw(self, draw_card: int):
-        self.hand.append(draw_card)
-        self.matrix[7 + self.hand[0]] = 1
-    def sort(self):
-        self.hand.sort()
-    def discard(self, big:int):
-        if big == 1:
-            _return = self.hand.pop(-1)
-            self.drop.append(_return)
-            return _return
-        else:
-            _return = self.hand.pop(0)
-            self.drop.append(_return)
-            return _return
-    def replace_hand(self, big:int):
-        self.draw()
-        self.discard(big)
-    def bet(self):
-        self.bet_decision = True
-    def net_income(self):
-        return self.currency_after - self.currency_before
-    def order(self, number: int):
-        self.matrix[number] = 1
-    def draw_game(self):
-        self.currency_after = self.currency_before
-    def temp_reset(self):
-        self.currency_before = self.currency_after
-
 
 def get_break_points(current_player, _1_player, _2_player, _3_player, _4_player, w,x,y,z):
     current_player_draw_or_not_samples = copy.deepcopy(current_player.matrix)
@@ -143,14 +84,20 @@ def library_assumption(player_0, player_1, player_2, player_3, player_4):
     if player_4.drop != []: player_0.matrix[131 + player_4.drop[0]] = -1
     
 def bet_step(player_0, player_1, player_2, player_3, player_4, blind, w, x, y, z):
-    player_0.bet()
-    player_0.currency_after -= blind
-    deck.pool += blind
-    player_0.matrix[147] = blind
-    player_1.matrix[w] = blind
-    player_2.matrix[x] = blind
-    player_3.matrix[y] = blind
-    player_4.matrix[z] = blind
+    if randint(0,1) == 1:
+        player_0.bet()
+        player_0.bet_decision == True
+        player_0.currency_after -= blind
+        deck.pool += blind
+        player_0.matrix[147] = blind
+        player_1.matrix[w] = blind
+        player_2.matrix[x] = blind
+        player_3.matrix[y] = blind
+        player_4.matrix[z] = blind
+        print ("", player_0.name, "bets.")
+        print (player_0.matrix[147])
+    else:
+        pass
 
 def process_final_open(final_open):
     if len(final_open) == 0:
@@ -166,9 +113,70 @@ def process_final_open(final_open):
             return min_player_key
         else:
             return max_player_key
-        
+
 def bet_summary(player):
     if player.bet_decision == True: final_open[player.name] = player.hand[0]
+class library:
+    def __init__(self, pool=1):
+        self.hand = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+        self.on_show = []
+        self.drop = []
+        self.pool = pool
+    def refresh(self):
+        shuffle(self.hand)
+    def place(self):
+        draw = self.hand.pop()
+        self.on_show.append(draw)
+    def replace(self):
+        draw = self.hand.pop()
+        self.drop.append(self.on_show.pop())
+        self.on_show.append(draw)
+    def drawn(self):
+        return self.hand.pop()
+
+    # self order: 0~4, change or not: 5, draw or not: 6, self discard: 7, hand: 8~22
+    # discard: 23~37, others keep or not: 38~41, others discard: 42~56, 57~71, 72~86, 87~101
+    # public card: 102~116, public discard: 117~131, library left: 132~146 self bet or not: 147
+    # others bet or not: 148~151 #games left:152
+    # start to play
+class player():
+    def __init__(self, draw_card = -1, pool = 0, big:int = -2, name_=''):
+        self.hand = []
+        self.drop = []
+        self.currency_before = 4
+        self.currency_after = 4
+        self.draw_card = draw_card
+        self.pool = pool
+        self.big = big
+        self.bet_decision = False
+        self.matrix = [0 for i in range(153)]
+        self.name = name_
+        self.net_income = self.currency_after - self.currency_before
+    def draw(self, draw_card: int):
+        self.hand.append(draw_card)
+        self.matrix[7 + self.hand[0]] = 1
+    def sort(self):
+        self.hand.sort()
+    def discard(self, big:int):
+        if big == 1:
+            _return = self.hand.pop(-1)
+            self.drop.append(_return)
+            return _return
+        else:
+            _return = self.hand.pop(0)
+            self.drop.append(_return)
+            return _return
+    def replace_hand(self, big:int):
+        self.draw()
+        self.discard(big)
+    def bet(self):
+        self.bet_decision = True
+    def order(self, number: int):
+        self.matrix[number] = 1
+    def draw_game(self):
+        self.currency_after = self.currency_before
+    def temp_reset(self):
+        self.currency_before = self.currency_after
 
 if __name__ == '__main__':
     rounds = 0
@@ -266,6 +274,11 @@ if __name__ == '__main__':
             player_3.currency_after += deck.pool
         elif result == 'player_4':
             player_4.currency_after += deck.pool
+        player_0_net_income = player_0.currency_after - player_0.currency_before
+        player_1_net_income = player_1.currency_after - player_1.currency_before
+        player_2_net_income = player_2.currency_after - player_2.currency_before
+        player_3_net_income = player_3.currency_after - player_3.currency_before
+        player_4_net_income = player_4.currency_after - player_4.currency_before
         player_0.temp_reset()
         player_1.temp_reset()
         player_2.temp_reset()
@@ -274,23 +287,23 @@ if __name__ == '__main__':
         draw_or_not_samples.append(player_0_draw_or_not_samples)
         discard_samples.append(player_0_discard_samples)
         bet_or_not_samples.append(player_0_bet_or_not_samples)
-        net_incomes.append(player_0.net_income)
+        net_incomes.append(player_0_net_income)
         draw_or_not_samples.append(player_1_draw_or_not_samples)
         discard_samples.append(player_1_discard_samples)
         bet_or_not_samples.append(player_1_bet_or_not_samples)
-        net_incomes.append(player_1.net_income)
+        net_incomes.append(player_1_net_income)
         draw_or_not_samples.append(player_2_draw_or_not_samples)
         discard_samples.append(player_2_discard_samples)
         bet_or_not_samples.append(player_2_bet_or_not_samples)
-        net_incomes.append(player_2.net_income)
+        net_incomes.append(player_2_net_income)
         draw_or_not_samples.append(player_3_draw_or_not_samples)
         discard_samples.append(player_3_discard_samples)
         bet_or_not_samples.append(player_3_bet_or_not_samples)
-        net_incomes.append(player_3.net_income)
+        net_incomes.append(player_3_net_income)
         draw_or_not_samples.append(player_4_draw_or_not_samples)
         discard_samples.append(player_4_discard_samples)
         bet_or_not_samples.append(player_4_bet_or_not_samples)
-        net_incomes.append(player_4.net_income)
+        net_incomes.append(player_4_net_income)
     print("到这为止正常。")
     print("start train.")
     model_draw, model_discard, model_bet = make_models()
