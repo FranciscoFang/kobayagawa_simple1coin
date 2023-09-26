@@ -298,7 +298,7 @@ if __name__ == '__main__':
     winner_discard_samples = []
     winner_bet_or_not_samples = []
     winner_net_incomes = []
-    while rounds< 10000:
+    while rounds< 10100:
         # while winner_draw_or_not_samples == []:
         rounds += 1
         blind = 1
@@ -335,7 +335,7 @@ if __name__ == '__main__':
             player_2_draw_or_not_samples, player_2_discard_samples = get_break_points(player_2, player_0, player_1, player_3, player_4, 39, 39, 40, 40)
             player_3_draw_or_not_samples, player_3_discard_samples = get_break_points(player_3, player_0, player_1, player_2, player_4, 40, 40, 40, 41)
             player_4_draw_or_not_samples, player_4_discard_samples = get_break_points(player_4, player_0, player_1, player_2, player_3, 41, 41, 41, 41)
-        elif rounds > 1001 and random_samples == True:
+        elif rounds > 1001 and rounds <= 10000 and random_samples == True:
             player_0_draw_or_not_samples, player_0_discard_samples = get_breakp_value(player_0, player_1, player_2, player_3, player_4, 38, 38, 38, 38)
             player_1_draw_or_not_samples, player_1_discard_samples = get_breakp_value(player_1, player_0, player_2, player_3, player_4, 38, 39, 39, 39)
             player_2_draw_or_not_samples, player_2_discard_samples = get_breakp_value(player_2, player_0, player_1, player_3, player_4, 39, 39, 40, 40)
@@ -510,31 +510,31 @@ if __name__ == '__main__':
             # model_bet.fit(bet_or_not_samples, net_incomes, epochs=200, verbose=0)
         elif rounds > 1001 and rounds < 10000 and rounds% 100 == 0:
             print("newest 100", p0w, p1w, p2w, p3w, p4w, rounds)
-            if p0w>= p1w and p0w>=p1w and p0w>=p2w and p0w>=p3w:
+            if p0w >= 19 and p0w>= p1w and p0w>=p1w and p0w>=p2w and p0w>=p3w:
                 print ("player_0 最多胜")
                 winner_draw_or_not_samples += p0_draw_or_not_samples
                 winner_discard_samples += p0_discard_samples
                 winner_bet_or_not_samples += p0_bet_or_not_samples
                 winner_net_incomes += p0_net_incomes
-            if p1w>= p0w and p1w>= p2w and p1w>= p3w and p1w>= p4w:
+            if p1w >= 19 and p1w>= p0w and p1w>= p2w and p1w>= p3w and p1w>= p4w:
                 print ("player_1 最多胜")
                 winner_draw_or_not_samples += p1_draw_or_not_samples
                 winner_discard_samples += p1_discard_samples
                 winner_bet_or_not_samples += p1_bet_or_not_samples
                 winner_net_incomes += p1_net_incomes
-            if p2w>= p0w and p2w>= p1w and p2w>= p3w and p2w>= p4w:
+            if p2w >= 19 and p2w>= p0w and p2w>= p1w and p2w>= p3w and p2w>= p4w:
                 print ("player_2 最多胜")
                 winner_draw_or_not_samples += p2_draw_or_not_samples
                 winner_discard_samples += p2_discard_samples
                 winner_bet_or_not_samples += p2_bet_or_not_samples
                 winner_net_incomes += p2_net_incomes
-            if p3w>= p0w and p3w>= p1w and p3w>= p2w and p3w>= p4w:
+            if p3w >= 19 and p3w>= p0w and p3w>= p1w and p3w>= p2w and p3w>= p4w:
                 print ("player_3 最多胜")
                 winner_draw_or_not_samples += p3_draw_or_not_samples
                 winner_discard_samples += p3_discard_samples
                 winner_bet_or_not_samples += p3_bet_or_not_samples
                 winner_net_incomes += p3_net_incomes
-            if p4w>= p0w and p4w>= p3w and p4w>= p2w and p4w>= p1w:
+            if p4w >= 19 and p4w>= p0w and p4w>= p3w and p4w>= p2w and p4w>= p1w:
                 print ("player_4 最多胜")
                 winner_draw_or_not_samples += p4_draw_or_not_samples
                 winner_discard_samples += p4_discard_samples
