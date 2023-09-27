@@ -64,7 +64,7 @@ def get_breakp_value(current_player, _1_player, _2_player, _3_player, _4_player,
     current_player_draw_option = calc_draw(current_player)
     if current_player_draw_option == 1: #draw
         draw_in = deck.drawn()
-        current_player.hand.append(draw_in)
+        current_player.hand.append(draw_in) #
         current_player.matrix[6] = 1
         current_player.matrix[7 + current_player.hand[0]] = 1
         current_player.matrix[7 + current_player.hand[1]] = 1
@@ -81,7 +81,7 @@ def get_breakp_value(current_player, _1_player, _2_player, _3_player, _4_player,
             current_player.discard(big=1)
             current_player.matrix[7 + current_player.hand[0]] = 1
             current_player.matrix[7 + current_player.hand[-1]] = 0
-            current_player.matrix[22 + current_player.drop[0]] = -1
+            current_player.matrix[22 + current_player.drop[0]] = -1 #####
         else: #discard small
             current_player_discard_samples = copy.deepcopy(current_player.matrix)
             current_player.matrix[7] = -1
@@ -94,7 +94,6 @@ def get_breakp_value(current_player, _1_player, _2_player, _3_player, _4_player,
         current_player.matrix[101 + current_player.hand[0]] = 1
         for i in deck.drop:
             current_player.matrix[116 + i] = -1
-        pass
     if current_player.drop != []:
         _1_player.matrix[41 + current_player.drop[0]] = 1
         _2_player.matrix[41 + current_player.drop[0]] = 1
@@ -125,14 +124,14 @@ def calc_draw(current_player):
     pred_0 += prediction_draw_0[0]
     prediction_draw_1 = model_draw.predict([current_player_matrix_1])
     pred_1 += prediction_draw_1[0]
-    print (pred_0[0])
-    print (pred_1[0])
+    # print (pred_0[0])
+    # print (pred_1[0])
     if pred_1>=pred_0: 
-        print(current_player.name, " should draw.")
+        # print(current_player.name, " should draw.")
         # p0_draw += 1
         return 1
     else: 
-        print(current_player.name, " should replace.")
+        # print(current_player.name, " should replace.")
         # p0_replace += 1
         return 0
 
@@ -334,7 +333,7 @@ if __name__ == '__main__':
             player_1_draw_or_not_samples, player_1_discard_samples = get_break_points(player_1, player_0, player_2, player_3, player_4, 38, 39, 39, 39)
             player_2_draw_or_not_samples, player_2_discard_samples = get_break_points(player_2, player_0, player_1, player_3, player_4, 39, 39, 40, 40)
             player_3_draw_or_not_samples, player_3_discard_samples = get_break_points(player_3, player_0, player_1, player_2, player_4, 40, 40, 40, 41)
-            player_4_draw_or_not_samples, player_4_discard_samples = get_break_points(player_4, player_0, player_1, player_2, player_3, 41, 41, 41, 41)
+            player_4_draw_or_not_samples, player_4_discard_samples = 19
         elif rounds > 1001 and rounds <= 10000 and random_samples == True:
             player_0_draw_or_not_samples, player_0_discard_samples = get_breakp_value(player_0, player_1, player_2, player_3, player_4, 38, 38, 38, 38)
             player_1_draw_or_not_samples, player_1_discard_samples = get_breakp_value(player_1, player_0, player_2, player_3, player_4, 38, 39, 39, 39)
@@ -464,6 +463,11 @@ if __name__ == '__main__':
                 winner_discard_samples += p4_discard_samples
                 winner_bet_or_not_samples += p4_bet_or_not_samples
                 winner_net_incomes += p4_net_incomes
+            p0w = 0
+            p1w = 0
+            p2w = 0
+            p3w = 0
+            p4w = 0
             if rounds == 1000:
                 print (len(winner_draw_or_not_samples))# rounds % 10000 == 0:
                 if  winner_draw_or_not_samples != []: 
@@ -540,6 +544,11 @@ if __name__ == '__main__':
                 winner_discard_samples += p4_discard_samples
                 winner_bet_or_not_samples += p4_bet_or_not_samples
                 winner_net_incomes += p4_net_incomes
+            p0w = 0
+            p1w = 0
+            p2w = 0
+            p3w = 0
+            p4w = 0
             if rounds % 1000 == 0 and winner_draw_or_not_samples != []: 
                 print ("training.")
                 model_draw.fit(winner_draw_or_not_samples, winner_net_incomes, epochs=2, verbose=1)
