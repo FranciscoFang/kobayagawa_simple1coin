@@ -2,7 +2,7 @@ from random import randint
 import numpy as np
 from random import shuffle
 import copy
-from make_models import make_draw_model, make_discard_model, make_discard_model
+from make_models import make_draw_model, make_discard_model, make_bet_model
 import tensorflow as tf
 import time
 
@@ -33,7 +33,7 @@ class player():
         self.pool = pool
         self.big = big
         self.bet_decision = False
-        self.matrix = [0 for i in range(28)]
+        self.matrix = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0]
         self.name = name_
         # 0: draw(1) or change(0)
         # 1: discard big(1) or small(-1)
@@ -247,7 +247,7 @@ def bet_step(deck, player_0: player, player_1, player_2, player_3, player_4, bli
         player_0.currency_after -= blind
         deck.pool += blind
         player_0.matrix[26] = deck.pool
-        player_0.matrix[21] = -blind
+        player_0.matrix[21] = blind
         player_1.matrix[w] = blind
         player_2.matrix[x] = blind
         player_3.matrix[y] = blind
@@ -704,7 +704,7 @@ def causal_game_with_previous_draw(model_previous, model_current):
         return False
 
 def random_game_discard():
-    model_random = make_draw_model()
+    model_random = make_bet_model()
     draw_game = 0
     winner_net_incomes = []
     player_0_dons_sum = []
@@ -1160,7 +1160,7 @@ def bet_step_model(deck, model_bet, player_0: player, player_1, player_2, player
         player_0.currency_after -= blind
         deck.pool += blind
         player_0.matrix[26] = deck.pool
-        player_0.matrix[21] = -blind
+        player_0.matrix[21] = blind
         player_1.matrix[w] = blind
         player_2.matrix[x] = blind
         player_3.matrix[y] = blind
@@ -1169,7 +1169,7 @@ def bet_step_model(deck, model_bet, player_0: player, player_1, player_2, player
         player_0.bet_or_not_samples = copy.deepcopy(player_0.matrix)
 
 def random_game_bet():
-    model_random = make_draw_model()
+    model_random = make_bet_model()
     winner_net_incomes = []
     player_0_dons_sum = []
     player_1_dons_sum = []
@@ -1188,7 +1188,7 @@ def random_game_bet():
     p3_win = 0
     p4_win = 0
     draw_games = 0
-    while epoch<2000:
+    while epoch<5000:
         epoch += 1
         blind = 1
         player_0 = player(name_='player_0')
@@ -1250,38 +1250,43 @@ def random_game_bet():
         elif result == 'player_4':
             player_4.currency_after += deck.pool
             p4_win += 1
-        player_0_net_income = player_0.currency_after - player_0.currency_before
-        player_0_dons_sum.append(player_0.draw_or_not_samples)
-        player_0_neti_sum.append([player_0_net_income])
-        player_1_net_income = player_1.currency_after - player_1.currency_before
-        player_1_dons_sum.append(player_1.draw_or_not_samples)
-        player_1_neti_sum.append([player_1_net_income])
-        player_2_net_income = player_2.currency_after - player_2.currency_before
-        player_2_dons_sum.append(player_2.draw_or_not_samples)
-        player_2_neti_sum.append([player_2_net_income])
-        player_3_net_income = player_3.currency_after - player_3.currency_before
-        player_3_dons_sum.append(player_3.draw_or_not_samples)
-        player_3_neti_sum.append([player_3_net_income])
-        player_4_net_income = player_4.currency_after - player_4.currency_before
-        player_4_dons_sum.append(player_4.draw_or_not_samples)
-        player_4_neti_sum.append([player_4_net_income])
+        winner_don_samples = []
+        winner_net_incomes = []
+        if player_0.bet_decision == True:
+            player_0_net_income = player_0.currency_after - player_0.currency_before
+            player_0_dons_sum.append(player_0.draw_or_not_samples)
+            player_0_neti_sum.append([player_0_net_income])
+            winner_don_samples += player_0_dons_sum
+            winner_net_incomes += player_0_neti_sum
+        if player_1.bet_decision == True:
+            player_1_net_income = player_1.currency_after - player_1.currency_before
+            player_1_dons_sum.append(player_1.draw_or_not_samples)
+            player_1_neti_sum.append([player_1_net_income])
+            winner_don_samples += player_1_dons_sum
+            winner_net_incomes += player_1_neti_sum
+        if player_2.bet_decision == True:
+            player_2_net_income = player_2.currency_after - player_2.currency_before
+            player_2_dons_sum.append(player_2.draw_or_not_samples)
+            player_2_neti_sum.append([player_2_net_income])
+            winner_don_samples += player_2_dons_sum
+            winner_net_incomes += player_2_neti_sum
+        if player_3.bet_decision == True:
+            player_3_net_income = player_3.currency_after - player_3.currency_before
+            player_3_dons_sum.append(player_3.draw_or_not_samples)
+            player_3_neti_sum.append([player_3_net_income])
+            winner_don_samples += player_3_dons_sum
+            winner_net_incomes += player_3_neti_sum
+        if player_4.bet_decision == True:
+            player_4_net_income = player_4.currency_after - player_4.currency_before
+            player_4_dons_sum.append(player_4.draw_or_not_samples)
+            player_4_neti_sum.append([player_4_net_income])
+            winner_don_samples += player_4_dons_sum
+            winner_net_incomes += player_4_neti_sum
         player_0.temp_reset()
         player_1.temp_reset()
         player_2.temp_reset()
         player_3.temp_reset()
         player_4.temp_reset()
-        winner_don_samples = []
-        winner_don_samples += player_0_dons_sum
-        winner_don_samples += player_1_dons_sum
-        winner_don_samples += player_2_dons_sum
-        winner_don_samples += player_3_dons_sum
-        winner_don_samples += player_4_dons_sum
-        winner_net_incomes = []
-        winner_net_incomes += player_0_neti_sum
-        winner_net_incomes += player_1_neti_sum
-        winner_net_incomes += player_2_neti_sum
-        winner_net_incomes += player_3_neti_sum
-        winner_net_incomes += player_4_neti_sum
     print ("training.")
     print (p0_win, p1_win, p2_win, p3_win, p4_win)
     print (len(winner_don_samples), len(winner_net_incomes))
@@ -1304,7 +1309,7 @@ def model_self_play_train_bet(model_bet):
     player_3_neti_sum = []
     player_4_neti_sum = []
     epoch = 0
-    while epoch<2000:
+    while epoch<1000:
         epoch += 1
         blind = 1
         player_0 = player(name_='player_0')
@@ -1360,45 +1365,50 @@ def model_self_play_train_bet(model_bet):
             player_3.currency_after += deck.pool
         elif result == 'player_4':
             player_4.currency_after += deck.pool
-        player_0_net_income = player_0.currency_after - player_0.currency_before
-        player_0_dons_sum.append(player_0.bet_or_not_samples)
-        player_0_neti_sum.append([player_0_net_income])
-        player_1_net_income = player_1.currency_after - player_1.currency_before
-        player_1_dons_sum.append(player_1.bet_or_not_samples)
-        player_1_neti_sum.append([player_1_net_income])
-        player_2_net_income = player_2.currency_after - player_2.currency_before
-        player_2_dons_sum.append(player_2.bet_or_not_samples)
-        player_2_neti_sum.append([player_2_net_income])
-        player_3_net_income = player_3.currency_after - player_3.currency_before
-        player_3_dons_sum.append(player_3.bet_or_not_samples)
-        player_3_neti_sum.append([player_3_net_income])
-        player_4_net_income = player_4.currency_after - player_4.currency_before
-        player_4_dons_sum.append(player_4.bet_or_not_samples)
-        player_4_neti_sum.append([player_4_net_income])
+        winner_don_samples = []
+        winner_net_incomes = []
+        if player_0.bet_decision == True:
+            player_0_net_income = player_0.currency_after - player_0.currency_before
+            player_0_dons_sum.append(player_0.draw_or_not_samples)
+            player_0_neti_sum.append([player_0_net_income])
+            winner_don_samples += player_0_dons_sum
+            winner_net_incomes += player_0_neti_sum
+        if player_1.bet_decision == True:
+            player_1_net_income = player_1.currency_after - player_1.currency_before
+            player_1_dons_sum.append(player_1.draw_or_not_samples)
+            player_1_neti_sum.append([player_1_net_income])
+            winner_don_samples += player_1_dons_sum
+            winner_net_incomes += player_1_neti_sum
+        if player_2.bet_decision == True:
+            player_2_net_income = player_2.currency_after - player_2.currency_before
+            player_2_dons_sum.append(player_2.draw_or_not_samples)
+            player_2_neti_sum.append([player_2_net_income])
+            winner_don_samples += player_2_dons_sum
+            winner_net_incomes += player_2_neti_sum
+        if player_3.bet_decision == True:
+            player_3_net_income = player_3.currency_after - player_3.currency_before
+            player_3_dons_sum.append(player_3.draw_or_not_samples)
+            player_3_neti_sum.append([player_3_net_income])
+            winner_don_samples += player_3_dons_sum
+            winner_net_incomes += player_3_neti_sum
+        if player_4.bet_decision == True:
+            player_4_net_income = player_4.currency_after - player_4.currency_before
+            player_4_dons_sum.append(player_4.draw_or_not_samples)
+            player_4_neti_sum.append([player_4_net_income])
+            winner_don_samples += player_4_dons_sum
+            winner_net_incomes += player_4_neti_sum
         player_0.temp_reset()
         player_1.temp_reset()
         player_2.temp_reset()
         player_3.temp_reset()
         player_4.temp_reset()
-        winner_don_samples = []
-        winner_don_samples += player_0_dons_sum
-        winner_don_samples += player_1_dons_sum
-        winner_don_samples += player_2_dons_sum
-        winner_don_samples += player_3_dons_sum
-        winner_don_samples += player_4_dons_sum
-        winner_net_incomes = []
-        winner_net_incomes += player_0_neti_sum
-        winner_net_incomes += player_1_neti_sum
-        winner_net_incomes += player_2_neti_sum
-        winner_net_incomes += player_3_neti_sum
-        winner_net_incomes += player_4_neti_sum
     print ("training.")
     model_bet.fit(winner_don_samples, winner_net_incomes, epochs=5, verbose=1)
     print ("done.")
     return model_bet
 
 def causal_game_with_random_bet(model_bet): #evaluate random
-    test_epochs = 2000
+    test_epochs = 1000
     model_wins = 0
     epoch = 0
     p0_win = 0
@@ -1490,7 +1500,7 @@ def causal_game_with_random_bet(model_bet): #evaluate random
             p4_win += 1
     print ("model_wins", model_wins)
     print (p0_win, p1_win, p2_win, p3_win, p4_win)
-    if model_wins >= 500:
+    if model_wins >= 275:
         print ("model_wins:", True)
         return True
     else:
@@ -1499,7 +1509,7 @@ def causal_game_with_random_bet(model_bet): #evaluate random
         return False
 
 def causal_game_with_previous_bet(model_previous, model_current):
-    test_epochs = 2000
+    test_epochs = 1000
     model_current_wins = 0
     epoch = 0
     p0_win = 0
